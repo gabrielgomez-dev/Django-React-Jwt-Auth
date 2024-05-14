@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework",
+    "corsheaders",
     "accounts",
 ]
 
@@ -51,6 +52,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -128,6 +131,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.CustomUser"
 
+# Cors settings
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_METHODS = ("DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT")
+
 # JWT settings
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -136,13 +148,17 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30), # Tiempo de vida del token de acceso
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1), # Tiempo de vida del token de actualización
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        minutes=30
+    ),  # Tiempo de vida del token de acceso
+    "REFRESH_TOKEN_LIFETIME": timedelta(
+        days=1
+    ),  # Tiempo de vida del token de actualización
     "ROTATE_REFRESH_TOKENS": True,  # Cada vez que un token de actualización se utilice para obtener un nuevo token de acceso, el token de actualización antiguo se invalidará y se emitirá uno nuevo. Por eso es importante mantener el token de actualización seguro, ya que cualquiera que tenga acceso a él puede obtener un nuevo token de acceso para el usuario.
     "BLACKLIST_AFTER_ROTATION": True,  # Despues de una rotacion de token, este parametro controla si el token de actualización anterior se invalida o no. Cuando se establece en True, un token de actualización utilizado para obtener un nuevo token de acceso será agregado a una lista negra, lo que significa que ya no se puede utilizar para obtener más tokens de acceso.
-    "UPDATE_LAST_LOGIN": False, 
-    "ALGORITHM": "HS256", # Algoritmo utilizado para firmar los tokens.
-    "SIGNING_KEY": SECRET_KEY, # Clave secreta utilizada para firmar los tokens. Si no se proporciona, se utilizará SECRET_KEY.
+    "UPDATE_LAST_LOGIN": False,
+    "ALGORITHM": "HS256",  # Algoritmo utilizado para firmar los tokens.
+    "SIGNING_KEY": SECRET_KEY,  # Clave secreta utilizada para firmar los tokens. Si no se proporciona, se utilizará SECRET_KEY.
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,
