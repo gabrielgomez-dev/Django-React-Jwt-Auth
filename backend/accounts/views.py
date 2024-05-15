@@ -9,6 +9,7 @@ from .serializers import (
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.status import (
+    HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_205_RESET_CONTENT,
     HTTP_400_BAD_REQUEST,
@@ -22,17 +23,20 @@ class UserRegistrationAPIView(GenericAPIView):
     serializer_class = UserRegistrationSerializer
 
     def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        user = serializer.save()
-        token = RefreshToken.for_user(user)
+            user = serializer.save()
+            token = RefreshToken.for_user(user)
 
-        data = serializer.data
-        data["refresh"] = str(token)
-        data["access"] = str(token.access_token)
+            data = serializer.data
+            data["refresh"] = str(token)
+            data["access"] = str(token.access_token)
 
-        return Response(data, status=HTTP_201_CREATED)
+            return Response(data, status=HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=HTTP_400_BAD_REQUEST)
 
 
 class UserLoginAPIView(GenericAPIView):
@@ -52,7 +56,7 @@ class UserLoginAPIView(GenericAPIView):
         data["refresh"] = str(token)
         data["access"] = str(token.access_token)
 
-        return Response(data, status=HTTP_201_CREATED)
+        return Response(data, status=HTTP_200_OK)
 
 
 class UserLogoutAPIView(GenericAPIView):

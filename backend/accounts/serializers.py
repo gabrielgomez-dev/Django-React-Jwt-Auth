@@ -40,21 +40,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     # The validate method is used to check if the password and password_confirm fields are the same.
     # This method is called when the serializer is validated.
     # If they are not, we raise a validation error.
-    def validate(self, attrs):
-        if attrs["password"] != attrs["password_confirm"]:
+    def validate(self, data):
+        if data["password"] != data["password_confirm"]:
             raise serializers.ValidationError(
                 {"password": "Password fields do not match."}
             )
 
         # Get the password field for custom validations
-        password = attrs["password"]
+        password = data["password"]
 
         if len(password) < 8:
             raise serializers.ValidationError(
                 {"password": "Password must be at least 8 characters long."}
             )
 
-        return attrs
+        return data
 
     def create(self, validated_data):
         # Remove the password_confirm field from the validated_data dictionary
@@ -82,9 +82,9 @@ class UserLoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=128, write_only=True)
 
     # The validate method is used to check if the email and password fields are valid, then authenticate the user.
-    def validate(self, attrs):
-        email = attrs["email"]
-        password = attrs["password"]
+    def validate(self, data):
+        email = data["email"]
+        password = data["password"]
 
         if email is None or password is None:
             raise serializers.ValidationError("Email and password are required")
